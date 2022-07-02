@@ -8,6 +8,7 @@ const router = express.Router();
 router.post("/login", async (req, res) => {
 	try {
 		const { email, password } = req.body;
+		// email check
 		const users = await pool.query(
 			"SELECT * FROM users WHERE user_email = $1",
 			[email]
@@ -22,9 +23,8 @@ router.post("/login", async (req, res) => {
 		if (!validPassword)
 			return res.status(401).json({ error: "Incorrect password" });
 		let tokens = jwtTokens(users.rows[0]);
-		res.json(tokens);
 		res.cookie("refresh_token", tokens.refreshToken, { httpOnly: true });
-		// return res.status(200).json("Success");
+		res.json(tokens);
 	} catch (error) {
 		res.status(401).json({ error: error.message });
 	}
